@@ -20,7 +20,12 @@ const CalculateYourSalary = () => {
   return (
     <div>
       <Box
-
+        sx={{
+          bgcolor: "#E0E0E0",
+          padding: "20px",
+          borderRadius: "10px",
+          maxWidth: "680px",
+        }}
       >
         <Grid container spacing={1}>
           <Grid item xs={6}>
