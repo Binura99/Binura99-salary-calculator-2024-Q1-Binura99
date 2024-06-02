@@ -6,15 +6,24 @@ const itemsSlice = createSlice({
     name: "items",
 
     initialState: {
-        Item: "",
+        earnings: [],
+        deductions:[],
+        basicSalary: 0
     },
 
     reducers: {
-        setItem: (state, action) => {
-            state.Item = action.payload.Item;
+        setEarnings: (state, action) => {
+            state.earnings = action.payload;
+            // console.log("===============", action.payload)
+        },
+        setDeductions: (state, action) => {
+            state.deductions = action.payload;
+        },
+        setBasicSalary: (state, action) => {
+            state.basicSalary = action.payload;
         },
     }
 })
 
-export const { setItem } = itemsSlice.actions;
+export const { setEarnings, setDeductions, setBasicSalary } = itemsSlice.actions;
 export default itemsSlice.reducer;

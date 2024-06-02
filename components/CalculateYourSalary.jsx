@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import {
@@ -15,17 +15,33 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ReplayIcon from "@mui/icons-material/Replay";
 import CloseIcon from "@mui/icons-material/Close";
+import { calculateSalaryFunction } from "@/untils/calculateSalaryFunction";
+import { useDispatch } from "react-redux";
+import { addAllEarnings, addBasicSalary, addDeductions } from "@/redux/itemService";
+import { setEarnings } from "@/reducers/itemsSlice";
 
 const CalculateYourSalary = () => {
-  const [allowances, setAllowances] = useState([{ id: Date.now(), title: "", amount: "", epf: false }]);
-  const [deductions, setDeductions] = useState([{ id: Date.now(), title: "", amount: "" }]);
+  const [earnings, setAllEarnings] = useState([
+    { id: Date.now(), title: "", amount: "", epf: false },
+  ]);
+  const [deductions, setDeductions] = useState([
+    { id: Date.now(), title: "", amount: "" },
+  ]);
+  const [basicSalary, setBasicSalary] = useState("");
+
+  const dispatch = useDispatch();
 
   const handleAddAllowance = () => {
-    setAllowances([...allowances, { id: Date.now(), title: "", amount: "", epf: false }]);
+    setAllEarnings([
+      ...earnings,
+      { id: Date.now(), title: "", amount: "", epf: false },
+    ]);
   };
 
   const handleRemoveAllowance = (id) => {
-    setAllowances(allowances.filter(allowance => allowance.id !== id));
+    if (earnings.length !== 1) {
+      setAllEarnings(earnings.filter((allowance) => allowance.id !== id));
+    }
   };
 
   const handleAddDeduction = () => {
@@ -33,12 +49,14 @@ const CalculateYourSalary = () => {
   };
 
   const handleRemoveDeduction = (id) => {
-    setDeductions(deductions.filter(deduction => deduction.id !== id));
+    if (deductions.length !== 1) {
+      setDeductions(deductions.filter((deduction) => deduction.id !== id));
+    }
   };
 
   const handleAllowanceChange = (id, field, value) => {
-    setAllowances(
-      allowances.map((allowance) =>
+    setAllEarnings(
+      earnings.map((allowance) =>
         allowance.id === id ? { ...allowance, [field]: value } : allowance
       )
     );
@@ -53,19 +71,33 @@ const CalculateYourSalary = () => {
   };
 
   const handleResetButton = () => {
-    setAllowances([{ id: Date.now(), title: "", amount: "", epf: false }]);
+    setAllEarnings([{ id: Date.now(), title: "", amount: "", epf: false }]);
     setDeductions([{ id: Date.now(), title: "", amount: "" }]);
-  }
-console.log(allowances)
+  };
+
+  useEffect(() => {
+
+    const fetch = async () => {
+
+      addAllEarnings(earnings);
+      addBasicSalary(basicSalary);
+      addDeductions(deductions);
+    };
+
+    fetch();
+  }, [earnings, deductions, basicSalary]);
+
+  // console.log(earnings);
   return (
     <div>
       <Box
         sx={{
-          bgcolor: "#E0E0E0",
+          bgcolor: "#FAFAFA ",
           padding: "20px",
           borderRadius: "10px",
           maxWidth: "680px",
-          minHeight: "550px"
+          minHeight: "550px",
+          mx: { xs: "10px", md: "0px" },
         }}
       >
         <Grid container spacing={1}>
@@ -78,8 +110,19 @@ console.log(allowances)
             </Typography>
           </Grid>
 
-          <Grid item xs={6} display={"flex"} justifyContent={"end"} alignContent={"center"}>
-            <Button onClick={handleResetButton} variant="text" color="primary" startIcon={<ReplayIcon />}>
+          <Grid
+            item
+            xs={6}
+            display={"flex"}
+            justifyContent={"end"}
+            alignContent={"center"}
+          >
+            <Button
+              onClick={handleResetButton}
+              variant="text"
+              color="primary"
+              startIcon={<ReplayIcon />}
+            >
               Reset
             </Button>
           </Grid>
@@ -91,6 +134,8 @@ console.log(allowances)
               placeholder="Basic Salary"
               sx={{ mt: 1 }}
               fullWidth
+              value={basicSalary}
+              onChange={(e) => setBasicSalary(e.target.value)}
             />
           </Grid>
 
@@ -101,29 +146,35 @@ console.log(allowances)
             </Typography>
           </Grid>
 
-          {allowances.map((allowance) => (
-            <Grid container spacing={1} key={allowance.id}>
-              <Grid mt={0} item xs={6}>
+          {earnings.map((allowance) => (
+            <Grid container spacing={1} p={"8px"} key={allowance.id}>
+              <Grid mt={0} item xs={6} sm={4}>
                 <TextField
                   size="small"
                   placeholder="Pay Details (Title)"
-                  sx={{ width: { md: "60%" }, paddingRight: 1 }}
+                  fullWidth
                   value={allowance.title}
                   onChange={(e) =>
                     handleAllowanceChange(allowance.id, "title", e.target.value)
                   }
                 />
+              </Grid>
+              <Grid mt={0} item xs={6} sm={2}>
                 <TextField
                   size="small"
                   placeholder="Amount"
-                  sx={{ width: { md: "40%" } }}
+                  fullWidth
                   value={allowance.amount}
                   onChange={(e) =>
-                    handleAllowanceChange(allowance.id, "amount", e.target.value)
+                    handleAllowanceChange(
+                      allowance.id,
+                      "amount",
+                      e.target.value
+                    )
                   }
                 />
               </Grid>
-              <Grid mt={0} item xs={6}>
+              <Grid mt={0} item xs={12} sm={6}>
                 <IconButton onClick={() => handleRemoveAllowance(allowance.id)}>
                   <CloseIcon />
                 </IconButton>
@@ -132,7 +183,11 @@ console.log(allowances)
                     <Checkbox
                       checked={allowance.epf}
                       onChange={(e) =>
-                        handleAllowanceChange(allowance.id, "epf", e.target.checked)
+                        handleAllowanceChange(
+                          allowance.id,
+                          "epf",
+                          e.target.checked
+                        )
                       }
                     />
                   }
@@ -142,7 +197,7 @@ console.log(allowances)
             </Grid>
           ))}
 
-          <Grid mt={0} item xs={6}>
+          <Grid mt={0} item xs={12}>
             <Button
               startIcon={<AddIcon />}
               variant="text"
@@ -163,28 +218,36 @@ console.log(allowances)
           </Grid>
 
           {deductions.map((deduction) => (
-            <Grid container spacing={1} key={deduction.id}>
-              <Grid mt={0} item xs={6}>
+            <Grid container p={"8px"} spacing={1} key={deduction.id}>
+              <Grid mt={0} item xs={6} sm={4}>
                 <TextField
                   size="small"
                   placeholder="Pay Details (Title)"
-                  sx={{ width: { md: "60%" }, paddingRight: 1 }}
+                  // sx={{ width: { md: "60%" }, paddingRight: 1 }}
+                  fullWidth
                   value={deduction.title}
                   onChange={(e) =>
                     handleDeductionChange(deduction.id, "title", e.target.value)
                   }
                 />
+              </Grid>
+              <Grid mt={0} item xs={5} sm={2}>
                 <TextField
                   size="small"
                   placeholder="Amount"
-                  sx={{ width: { md: "40%" } }}
+                  // sx={{ width: { md: "40%" } }}
+                  fullWidth
                   value={deduction.amount}
                   onChange={(e) =>
-                    handleDeductionChange(deduction.id, "amount", e.target.value)
+                    handleDeductionChange(
+                      deduction.id,
+                      "amount",
+                      e.target.value
+                    )
                   }
                 />
               </Grid>
-              <Grid mt={0} item xs={6}>
+              <Grid mt={0} item xs={1} sm={6}>
                 <IconButton onClick={() => handleRemoveDeduction(deduction.id)}>
                   <CloseIcon />
                 </IconButton>
@@ -192,7 +255,7 @@ console.log(allowances)
             </Grid>
           ))}
 
-          <Grid mt={0} item xs={6}>
+          <Grid mt={0} item xs={12}>
             <Button
               startIcon={<AddIcon />}
               variant="text"
@@ -202,7 +265,6 @@ console.log(allowances)
               Add New Deduction
             </Button>
           </Grid>
-
         </Grid>
       </Box>
     </div>

@@ -1,7 +1,81 @@
+"use client";
+
 import { Box, Grid, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import store from "@/redux/store";
+import { apitFunctions } from "@/untils/apitFunctions";
+import { calculateSalaryFunction } from "@/untils/calculateSalaryFunction";
+import { useSelector } from "react-redux";
 
 const YourSalary = () => {
+
+  const [grossEarning, setGrossEarning] = useState(0);
+  const [grossDeduction, setGrossDeduction] = useState(0);
+  const [employeeEPF, setEmployeeEPF] = useState(0);
+  const [apit, setApit] = useState(0);
+  const [employerEPF, setEmployerEPF] = useState(0);
+  const [employerETF, setEmployerETF] = useState(0);
+  const [bSalary, setBSalary] = useState(0);
+
+  // console.log("1", basicSalary);
+
+
+  const Data = useSelector((state) => state.items)
+  // console.log("abc", abc)
+  
+
+  useEffect(() => {
+
+    // console.log("-=-=", store.getState().items)
+    // let Data = store.getState().items;
+
+    console.log("Data", Data)
+
+    let basicSalary = Data.basicSalary;
+    const deductions = Data.deductions;
+    const earnings = Data.earnings;
+
+    setBSalary(Number(basicSalary));
+
+    let sumOfEarnings = 0;
+    let epfAllowed = [];
+    let sumOfEpfAllowed = 0;
+    let sumOfDeduction = 0;
+
+    epfAllowed = earnings.filter((earning) => earning.epf);
+
+    sumOfEarnings = earnings.reduce(
+      (sum, earning) => sum + Number(earning.amount),
+      0
+    );
+    sumOfEpfAllowed = epfAllowed.reduce(
+      (sum, earning) => sum + Number(earning.amount),
+      0
+    );
+    sumOfDeduction = deductions.reduce(
+      (sum, value) => sum + Number(value.amount),
+      0
+    );
+
+    const calculateItems = calculateSalaryFunction(
+      Number(basicSalary),
+      Number(sumOfEpfAllowed),
+      Number(sumOfEarnings),
+      Number(sumOfDeduction)
+    );
+
+    setGrossEarning(calculateItems.grossEarnings);
+    setGrossDeduction(calculateItems.grossDeduction);
+    setEmployerETF(calculateItems.employerETF);
+    setEmployerEPF(calculateItems.employerEPF);
+    setEmployeeEPF(calculateItems.employeeEPF);
+
+    const apit = apitFunctions(calculateItems.grossEarnings);
+
+    setApit(apit);
+
+  }, [Data])
+
   return (
     <Box
       sx={{
@@ -11,10 +85,10 @@ const YourSalary = () => {
         padding: "20px",
         borderRadius: "10px",
         maxWidth: "480px",
-        minWidth: "480px",
-        minHeight: "550px"
-
-        
+        // minWidth: "480px",
+        minHeight: {xs: "450px", md: "550px"},
+        mx: {xs: "10px", md: "0px"},
+        mb: {xs: "10px", md: "0px"}
       }}
     >
       <Grid container spacing={0}>
@@ -51,7 +125,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Basic Salary</Typography>
-          <Typography>Amount</Typography>
+          <Typography>{bSalary}</Typography>
         </Grid>
         <Grid
           item
@@ -63,7 +137,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Gross Earning</Typography>
-          <Typography>Amount</Typography>
+          <Typography>{grossEarning}</Typography>
         </Grid>
         <Grid
           item
@@ -75,7 +149,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Gross Deduction</Typography>
-          <Typography>Amount</Typography>
+          <Typography>{grossDeduction}</Typography>
         </Grid>
         <Grid
           item
@@ -87,7 +161,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Employee EPF (8%)</Typography>
-          <Typography>Amount</Typography>
+          <Typography>{employeeEPF}</Typography>
         </Grid>
         <Grid
           item
@@ -99,7 +173,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>APIT</Typography>
-          <Typography>Amount</Typography>
+          <Typography>{apit}</Typography>
         </Grid>
 
         <Grid
@@ -124,8 +198,8 @@ const YourSalary = () => {
               borderColor: "#E0E0E0",
             }}
           >
-            <Typography color="initial">Net Salary(Take Home)</Typography>
-            <Typography color="initial">xxxxx</Typography>
+            <Typography fontWeight={"bold"} color="initial">Net Salary(Take Home)</Typography>
+            <Typography fontWeight={"bold"} color="initial">{grossEarning-grossDeduction-apit}</Typography>
           </Box>
         </Grid>
 
@@ -134,13 +208,12 @@ const YourSalary = () => {
           xs={12}
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-start",
             flexDirection: "row",
             mb: 1,
           }}
         >
-          <Typography sx={{ fontSize: "12px" }}>Item</Typography>
-          <Typography sx={{ fontSize: "12px" }}>Amount</Typography>
+          <Typography sx={{ fontSize: "12px" }}>Contribution from the Employer</Typography>
         </Grid>
 
         <Grid
@@ -152,8 +225,8 @@ const YourSalary = () => {
             flexDirection: "row",
           }}
         >
-          <Typography>APIT</Typography>
-          <Typography>Amount</Typography>
+          <Typography>Employer EPF (12%)</Typography>
+          <Typography>{employerEPF}</Typography>
         </Grid>
 
         <Grid
@@ -165,8 +238,8 @@ const YourSalary = () => {
             flexDirection: "row",
           }}
         >
-          <Typography>APIT</Typography>
-          <Typography>Amount</Typography>
+          <Typography>Employer ETF (3%)</Typography>
+          <Typography>{employerETF}</Typography>
         </Grid>
 
         <Grid
@@ -180,7 +253,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>CTC (Cost To Company)</Typography>
-          <Typography>xxxx</Typography>
+          <Typography>{employerEPF+grossEarning}</Typography>
         </Grid>
       </Grid>
     </Box>
