@@ -15,6 +15,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import resetIcon from "../assets/Iconcolor.png";
 import ReplayIcon from '@mui/icons-material/Replay';
+import CloseIcon from '@mui/icons-material/Close';
 
 const CalculateYourSalary = () => {
   return (
@@ -25,6 +26,7 @@ const CalculateYourSalary = () => {
           padding: "20px",
           borderRadius: "10px",
           maxWidth: "680px",
+          minHeight: "550px"
         }}
       >
         <Grid container spacing={1}>
@@ -82,8 +84,8 @@ const CalculateYourSalary = () => {
           </Grid>
 
           <Grid mt={0} item xs={6}>
-            <IconButton aria-label="delete">
-              <CancelIcon sx={{ color: "" }} />
+            <IconButton>
+              <CloseIcon />
             </IconButton>
             <FormControlLabel
               control={<Checkbox defaultChecked />}
@@ -97,9 +99,9 @@ const CalculateYourSalary = () => {
             </Button>
           </Grid>
 
-          <Divider orientation="horizontal" sx={{ width: "100%" }} />
+          <Divider orientation="horizontal" sx={{ width: "100%", my:2 }} />
 
-          <Grid mt={2} item xs={12}>
+          <Grid mb={0} item xs={12}>
             <Typography sx={{ fontSize: "16px" }}> Deductions</Typography>
             <Typography sx={{ fontSize: "12px", color: "#757575" }}>
               {" "}
@@ -125,8 +127,8 @@ const CalculateYourSalary = () => {
           </Grid>
 
           <Grid mt={0} item xs={6}>
-            <IconButton aria-label="delete">
-              <CancelIcon sx={{ color: "" }} />
+          <IconButton>
+              <CloseIcon />
             </IconButton>
           </Grid>
 
