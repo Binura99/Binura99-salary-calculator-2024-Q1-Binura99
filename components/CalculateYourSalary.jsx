@@ -15,10 +15,12 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ReplayIcon from "@mui/icons-material/Replay";
 import CloseIcon from "@mui/icons-material/Close";
-import { calculateSalaryFunction } from "@/untils/calculateSalaryFunction";
-import { useDispatch } from "react-redux";
-import { addAllEarnings, addBasicSalary, addDeductions } from "@/redux/itemService";
-import { setEarnings } from "@/reducers/itemsSlice";
+import {
+  addAllEarnings,
+  addBasicSalary,
+  addDeductions,
+} from "@/redux/itemService";
+import Iconcolor from "@/assets/Iconcolor.png"
 
 const CalculateYourSalary = () => {
   const [earnings, setAllEarnings] = useState([
@@ -28,8 +30,17 @@ const CalculateYourSalary = () => {
     { id: Date.now(), title: "", amount: "" },
   ]);
   const [basicSalary, setBasicSalary] = useState("");
+  const [errors, setErrors] = useState({ basicSalary: "", earnings: {}, deductions: {} });
 
-  const dispatch = useDispatch();
+  const validateAmount = (value) => {
+    const regex = /^[0-9]*$/;
+    return regex.test(value) ? "" : "Amount must be a number";
+  };
+
+  const validateBasicSalary = (value) => {
+    const regex = /^[0-9]*$/;
+    return regex.test(value) ? "" : "Basic salary must be a number";
+  };
 
   const handleAddAllowance = () => {
     setAllEarnings([
@@ -41,6 +52,11 @@ const CalculateYourSalary = () => {
   const handleRemoveAllowance = (id) => {
     if (earnings.length !== 1) {
       setAllEarnings(earnings.filter((allowance) => allowance.id !== id));
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.earnings[id];
+        return newErrors;
+      });
     }
   };
 
@@ -51,6 +67,11 @@ const CalculateYourSalary = () => {
   const handleRemoveDeduction = (id) => {
     if (deductions.length !== 1) {
       setDeductions(deductions.filter((deduction) => deduction.id !== id));
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.deductions[id];
+        return newErrors;
+      });
     }
   };
 
@@ -60,6 +81,13 @@ const CalculateYourSalary = () => {
         allowance.id === id ? { ...allowance, [field]: value } : allowance
       )
     );
+
+    if (field === "amount") {
+      setErrors((prev) => ({
+        ...prev,
+        earnings: { ...prev.earnings, [id]: validateAmount(value) },
+      }));
+    }
   };
 
   const handleDeductionChange = (id, field, value) => {
@@ -68,17 +96,32 @@ const CalculateYourSalary = () => {
         deduction.id === id ? { ...deduction, [field]: value } : deduction
       )
     );
+
+    if (field === "amount") {
+      setErrors((prev) => ({
+        ...prev,
+        deductions: { ...prev.deductions, [id]: validateAmount(value) },
+      }));
+    }
+  };
+
+  const handleBasicSalaryChange = (value) => {
+    setBasicSalary(value);
+    setErrors((prev) => ({
+      ...prev,
+      basicSalary: validateBasicSalary(value),
+    }));
   };
 
   const handleResetButton = () => {
     setAllEarnings([{ id: Date.now(), title: "", amount: "", epf: false }]);
     setDeductions([{ id: Date.now(), title: "", amount: "" }]);
+    setBasicSalary("");
+    setErrors({ basicSalary: "", earnings: {}, deductions: {} });
   };
 
   useEffect(() => {
-
     const fetch = async () => {
-
       addAllEarnings(earnings);
       addBasicSalary(basicSalary);
       addDeductions(deductions);
@@ -87,7 +130,6 @@ const CalculateYourSalary = () => {
     fetch();
   }, [earnings, deductions, basicSalary]);
 
-  // console.log(earnings);
   return (
     <div>
       <Box
@@ -97,6 +139,8 @@ const CalculateYourSalary = () => {
           borderRadius: "10px",
           maxWidth: "680px",
           minHeight: "550px",
+          border: "solid 2px",
+          borderColor: "#E0E0E0",
           mx: { xs: "10px", md: "0px" },
         }}
       >
@@ -121,6 +165,7 @@ const CalculateYourSalary = () => {
               onClick={handleResetButton}
               variant="text"
               color="primary"
+              sx={{fontWeight: 600}}
               startIcon={<ReplayIcon />}
             >
               Reset
@@ -135,7 +180,10 @@ const CalculateYourSalary = () => {
               sx={{ mt: 1 }}
               fullWidth
               value={basicSalary}
-              onChange={(e) => setBasicSalary(e.target.value)}
+              onChange={(e) => handleBasicSalaryChange(e.target.value)}
+              type="text"
+              error={!!errors.basicSalary}
+              helperText={errors.basicSalary}
             />
           </Grid>
 
@@ -172,6 +220,9 @@ const CalculateYourSalary = () => {
                       e.target.value
                     )
                   }
+                  type="text"
+                  error={!!errors.earnings[allowance.id]}
+                  helperText={errors.earnings[allowance.id]}
                 />
               </Grid>
               <Grid mt={0} item xs={12} sm={6}>
@@ -223,7 +274,6 @@ const CalculateYourSalary = () => {
                 <TextField
                   size="small"
                   placeholder="Pay Details (Title)"
-                  // sx={{ width: { md: "60%" }, paddingRight: 1 }}
                   fullWidth
                   value={deduction.title}
                   onChange={(e) =>
@@ -235,7 +285,6 @@ const CalculateYourSalary = () => {
                 <TextField
                   size="small"
                   placeholder="Amount"
-                  // sx={{ width: { md: "40%" } }}
                   fullWidth
                   value={deduction.amount}
                   onChange={(e) =>
@@ -245,6 +294,9 @@ const CalculateYourSalary = () => {
                       e.target.value
                     )
                   }
+                  type="text"
+                  error={!!errors.deductions[deduction.id]}
+                  helperText={errors.deductions[deduction.id]}
                 />
               </Grid>
               <Grid mt={0} item xs={1} sm={6}>

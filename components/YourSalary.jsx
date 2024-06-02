@@ -125,7 +125,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Basic Salary</Typography>
-          <Typography>{bSalary}</Typography>
+          <Typography>{bSalary}.00</Typography>
         </Grid>
         <Grid
           item
@@ -137,7 +137,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Gross Earning</Typography>
-          <Typography>{grossEarning}</Typography>
+          <Typography>{grossEarning}.00</Typography>
         </Grid>
         <Grid
           item
@@ -149,7 +149,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Gross Deduction</Typography>
-          <Typography>{grossDeduction}</Typography>
+          <Typography>{grossDeduction}.00</Typography>
         </Grid>
         <Grid
           item
@@ -161,7 +161,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Employee EPF (8%)</Typography>
-          <Typography>{employeeEPF}</Typography>
+          <Typography>{employeeEPF}.00</Typography>
         </Grid>
         <Grid
           item
@@ -173,7 +173,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>APIT</Typography>
-          <Typography>{apit}</Typography>
+          <Typography>{apit}.00</Typography>
         </Grid>
 
         <Grid
@@ -199,7 +199,7 @@ const YourSalary = () => {
             }}
           >
             <Typography fontWeight={"bold"} color="initial">Net Salary(Take Home)</Typography>
-            <Typography fontWeight={"bold"} color="initial">{grossEarning-grossDeduction-apit}</Typography>
+            <Typography fontWeight={"bold"} color="initial">{grossEarning-grossDeduction-apit}.00</Typography>
           </Box>
         </Grid>
 
@@ -226,7 +226,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Employer EPF (12%)</Typography>
-          <Typography>{employerEPF}</Typography>
+          <Typography>{employerEPF}.00</Typography>
         </Grid>
 
         <Grid
@@ -239,7 +239,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>Employer ETF (3%)</Typography>
-          <Typography>{employerETF}</Typography>
+          <Typography>{employerETF}.00</Typography>
         </Grid>
 
         <Grid
@@ -253,7 +253,7 @@ const YourSalary = () => {
           }}
         >
           <Typography>CTC (Cost To Company)</Typography>
-          <Typography>{employerEPF+grossEarning}</Typography>
+          <Typography>{employerEPF+grossEarning}.00</Typography>
         </Grid>
       </Grid>
     </Box>
